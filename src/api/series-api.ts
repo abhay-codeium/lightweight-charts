@@ -10,6 +10,7 @@ import { Coordinate } from '../model/coordinate';
 import { CustomPriceLine } from '../model/custom-price-line';
 import { DataUpdatesConsumer, SeriesDataItemTypeMap, WhitespaceData } from '../model/data-consumer';
 import { checkItemsAreOrdered, checkPriceLineOptions, checkSeriesValuesType } from '../model/data-validators';
+import { WhitespacePlotRow } from '../model/get-series-plot-row-creator';
 import { IHorzScaleBehavior } from '../model/ihorz-scale-behavior';
 import { ISeriesPrimitiveBase } from '../model/iseries-primitive';
 import { Pane } from '../model/pane';
@@ -27,7 +28,7 @@ import { IRange, Logical, TimePointIndex } from '../model/time-data';
 import { TimeScaleVisibleRange } from '../model/time-scale-visible-range';
 
 import { IPriceScaleApiProvider } from './chart-api';
-import { getSeriesDataCreator } from './get-series-data-creator';
+import { createWhitespaceData, getSeriesDataCreator } from './get-series-data-creator';
 import { type IChartApiBase } from './ichart-api';
 import { IPaneApi } from './ipane-api';
 import { IPriceLine } from './iprice-line';
@@ -172,10 +173,22 @@ export class SeriesApi<
 		return creator(data) as TData | null;
 	}
 
-	public data(): readonly TData[] {
+	public data(includeWhitespace?: boolean): readonly TData[] {
 		const seriesCreator = getSeriesDataCreator(this.seriesType());
-		const rows = this._series.bars().rows();
-		return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
+
+		if (includeWhitespace) {
+			const allRows = this._series.dataIncludingWhitespace();
+			return allRows.map((row: SeriesPlotRow<TSeriesType> | WhitespacePlotRow) => {
+				if (Object.prototype.hasOwnProperty.call(row, 'value')) {
+					return seriesCreator(row as SeriesPlotRow<TSeriesType>) as TData;
+				} else {
+					return createWhitespaceData(row.originalTime) as TData;
+				}
+			});
+		} else {
+			const rows = this._series.bars().rows();
+			return rows.map((row: SeriesPlotRow<TSeriesType>) => seriesCreator(row) as TData);
+		}
 	}
 
 	public subscribeDataChanged(handler: DataChangedHandler): void {

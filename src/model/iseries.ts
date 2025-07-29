@@ -1,9 +1,10 @@
 import { BarPrice, BarPrices } from './bar';
 import { Coordinate } from './coordinate';
+import { WhitespacePlotRow } from './get-series-plot-row-creator';
 import { IPriceDataSource } from './iprice-data-source';
 import { PriceScale } from './price-scale';
 import { ISeriesBarColorer } from './series-bar-colorer';
-import { SeriesPlotList } from './series-data';
+import { SeriesPlotList, SeriesPlotRow } from './series-data';
 import { SeriesOptionsMap, SeriesType } from './series-options';
 import { TimePointIndex } from './time-data';
 
@@ -44,6 +45,7 @@ export interface SeriesDataAtTypeMap {
 
 export interface ISeries<T extends SeriesType> extends IPriceDataSource {
 	bars(): SeriesPlotList<T>;
+	dataIncludingWhitespace(): readonly (SeriesPlotRow<T> | WhitespacePlotRow)[];
 	visible(): boolean;
 	options(): Readonly<SeriesOptionsMap[T]>;
 	title(): string;

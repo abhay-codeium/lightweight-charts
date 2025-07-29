@@ -7,6 +7,7 @@ import {
 	OhlcData,
 	SeriesDataItemTypeMap,
 	SingleValueData,
+	WhitespaceData,
 } from '../model/data-consumer';
 import { CustomData } from '../model/icustom-series';
 import { PlotRow, PlotRowValueIndex } from '../model/plot-data';
@@ -156,4 +157,8 @@ function customData<HorzScaleItem>(plotRow: CustomPlotRow): CustomData<HorzScale
 		...plotRow.data,
 		time,
 	};
+}
+
+export function createWhitespaceData<HorzScaleItem>(time: HorzScaleItem): WhitespaceData<HorzScaleItem> {
+	return { time };
 }

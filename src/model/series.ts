@@ -23,6 +23,7 @@ import { IChartModelBase } from './chart-model';
 import { Coordinate } from './coordinate';
 import { CustomPriceLine } from './custom-price-line';
 import { isDefaultPriceScale } from './default-price-scale';
+import { WhitespacePlotRow } from './get-series-plot-row-creator';
 import { CustomData, CustomSeriesWhitespaceData, ICustomSeriesPaneView, WhitespaceCheck } from './icustom-series';
 import { PrimitiveHoveredItem, PrimitivePaneViewZOrder } from './ipane-primitive';
 import { FirstValue } from './iprice-data-source';
@@ -305,6 +306,10 @@ export class Series<T extends SeriesType> extends PriceDataSource implements IDe
 
 	public bars(): SeriesPlotList<T> {
 		return this._data;
+	}
+
+	public dataIncludingWhitespace(): readonly (SeriesPlotRow<T> | WhitespacePlotRow)[] {
+		return this._data.rows();
 	}
 
 	public dataAt(time: TimePointIndex): SeriesDataAtTypeMap[SeriesType] | null {

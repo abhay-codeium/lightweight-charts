@@ -204,13 +204,15 @@ export interface ISeriesApi<
 	/**
 	 * Returns all the bar data for the series.
 	 *
-	 * @returns Original data items provided via setData or update methods.
+	 * @param includeWhitespace - If true, includes whitespace data (gaps) in the returned array. Default is false.
+	 * @returns Original data items provided via setData or update methods, optionally including whitespace data.
 	 * @example
 	 * ```js
 	 * const originalData = series.data();
+	 * const dataWithWhitespace = series.data(true);
 	 * ```
 	 */
-	data(): readonly TData[];
+	data(includeWhitespace?: boolean): readonly TData[];
 
 	/**
 	 * Subscribe to the data changed event. This event is fired whenever the `update` or `setData` method is evoked
