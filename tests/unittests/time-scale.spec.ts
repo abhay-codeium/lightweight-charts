@@ -9,8 +9,10 @@ import { HorzScaleBehaviorTime } from '../../src/model/horz-scale-behavior-time/
 import { Time, UTCTimestamp } from '../../src/model/horz-scale-behavior-time/types';
 import { InternalHorzScaleItem } from '../../src/model/ihorz-scale-behavior';
 import { LocalizationOptions } from '../../src/model/localization-options';
-import { TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
+import { RangeImpl } from '../../src/model/range-impl';
+import { Logical, TickMarkWeightValue, TimePointIndex, TimeScalePoint } from '../../src/model/time-data';
 import { TimeScale } from '../../src/model/time-scale';
+import { TimeScaleVisibleRange } from '../../src/model/time-scale-visible-range';
 
 function chartModelMock(): ChartModel<Time> {
 	// eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -124,6 +126,41 @@ describe('TimeScale', () => {
 			ts.update(...tsUpdate(1));
 
 			expect(ts.timeToIndex({ timestamp: 0.5 as UTCTimestamp } as unknown as InternalHorzScaleItem, true)).to.be.equal(1);
+		});
+	});
+
+	describe('TimeScaleVisibleRange.strictRange', () => {
+		it('should use Math.round for fractional logical ranges (issue #1924)', () => {
+			const fractionalRange = new RangeImpl(0.49 as Logical, 0.51 as Logical);
+			const visibleRange = new TimeScaleVisibleRange(fractionalRange);
+			const strictRange = visibleRange.strictRange();
+
+			if (strictRange !== null) {
+				expect(strictRange.left()).to.be.equal(0 as TimePointIndex);
+				expect(strictRange.right()).to.be.equal(1 as TimePointIndex);
+			}
+		});
+
+		it('should handle edge cases where Math.round differs from Math.floor/ceil', () => {
+			const edgeRange = new RangeImpl(0.6 as Logical, 1.4 as Logical);
+			const visibleRange = new TimeScaleVisibleRange(edgeRange);
+			const strictRange = visibleRange.strictRange();
+
+			if (strictRange !== null) {
+				expect(strictRange.left()).to.be.equal(1 as TimePointIndex);
+				expect(strictRange.right()).to.be.equal(1 as TimePointIndex);
+			}
+		});
+
+		it('should handle integer ranges correctly', () => {
+			const integerRange = new RangeImpl(1 as Logical, 3 as Logical);
+			const visibleRange = new TimeScaleVisibleRange(integerRange);
+			const strictRange = visibleRange.strictRange();
+
+			if (strictRange !== null) {
+				expect(strictRange.left()).to.be.equal(1 as TimePointIndex);
+				expect(strictRange.right()).to.be.equal(3 as TimePointIndex);
+			}
 		});
 	});
 });
