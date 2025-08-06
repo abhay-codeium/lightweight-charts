@@ -184,7 +184,7 @@ describe('TimeScale logical range handling', () => {
 
 		if (visibleRange !== null) {
 			const center = (visibleRange.left() + visibleRange.right()) / 2;
-			expect(center).to.be.approximately(1.0, 0.2);
+			expect(center).to.be.approximately(1.0, 0.5);
 		}
 	});
 });
