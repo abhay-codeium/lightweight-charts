@@ -803,6 +803,12 @@ export class TimeScale<HorzScaleItem> implements ITimeScale {
 	}
 
 	public setLogicalRange(range: LogicalRange): void {
+		const rangeWidth = range.to - range.from;
+
+		if (rangeWidth <= 0) {
+			return;
+		}
+
 		const barRange = new RangeImpl(
 			range.from as number as TimePointIndex,
 			range.to as number as TimePointIndex
